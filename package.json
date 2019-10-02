@@ -13,8 +13,8 @@
     "start": "node build/index.js",
     "postinstall": "npm run build",
     "pretest": "cross-env NODE_ENV=test npm run db:migrate",
-    "test": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles --runInBand --forceExit",
-    "test:watch": "cross-env NODE_ENV=test jest --no-cache  --detectOpenHandles --runInBand --watch"
+    "test": "jest --coverage --no-cache --detectOpenHandles --runInBand --forceExit",
+    "test:watch": "jest --no-cache --detectOpenHandles --runInBand --watch"
   },
   "repository": {
     "type": "git",

@@ -58,4 +58,6 @@ class Response {
   }
 }
 
-export default new Response();
+const response = new Response();
+
+export default response;

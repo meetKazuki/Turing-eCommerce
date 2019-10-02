@@ -1,7 +1,5 @@
-import chai from 'chai';
-import app from '../../index';
-
-const { expect } = chai;
+import { expect } from 'chai';
+import app from '../..';
 
 describe('App is setup correctly', () => {
   it('should confirm app is a function', () => {
