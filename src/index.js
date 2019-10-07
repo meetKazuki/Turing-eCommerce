@@ -12,7 +12,7 @@ const app = express();
 const corsOptions = {
   credentials: true,
   origin: [],
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200, // legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 const { NODE_ENV, PORT } = process.env;
@@ -25,6 +25,18 @@ app.use(express.json());
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(router);
+
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  // eslint-disable-line no-unused-vars
+  return res.status(err.status || 500).json({
+    error: {
+      message: err.message,
+      error: {},
+    },
+    status: false,
+  });
+});
 
 const port = NODE_ENV === 'test' ? 8378 : PORT || 3000;
 
