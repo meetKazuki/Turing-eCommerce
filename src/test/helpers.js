@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 import models, { sequelize } from '../database/models';
 
 function truncateTable(modelName) {
