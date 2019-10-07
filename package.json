@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "dev": "nodemon --watch src --exec babel-node ./src/index.js",
     "test": "cross-env NODE_ENV=test jest --detectOpenHandles --runInBand --forceExit"
   },
@@ -25,6 +26,7 @@
     "@babel/preset-env": "^7.6.2",
     "babel-jest": "^24.9.0",
     "chai": "^4.2.0",
+    "coveralls": "^3.0.6",
     "cross-env": "^6.0.3",
     "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
