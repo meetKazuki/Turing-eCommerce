@@ -4,15 +4,23 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npm run clean && npm run build:babel",
+    "build:babel": "cross-env NODE_ENV=production babel src -d dist --copy-files",
+    "clean": "rm -rf dist .nyc_output build coverage && mkdir dist",
     "coverage": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "dev": "nodemon --watch src --exec babel-node ./src/index.js",
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --runInBand --forceExit"
+    "postinstall": "npm run build",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --runInBand --forceExit",
+    "test:watch": "cross-env NODE_ENV=test jest --no-cache  --detectOpenHandles --runInBand --watch"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meetKazuki/Turing-eCommerce.git"
   },
-  "keywords": [],
+  "keywords": [
+    "nodejs"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
