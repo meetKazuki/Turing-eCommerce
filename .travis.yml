@@ -1,25 +1,32 @@
 language: node_js
 node_js:
   - stable
-cache:
-  directories:
-    - node_modules
-
-install:
-  - npm install
+sudo: false
 
 services:
   - mysql
 
+install:
+  - npm install
+
 before_script:
+  - mysql -e 'DROP USER IF EXISTS travis@localhost;'
+  - mysql -e 'CREATE USER travis@localhost;'
   - mysql -e 'DROP DATABASE IF EXISTS turing_test;'
   - mysql -e 'CREATE DATABASE turing_test;'
+  - mysql -e "GRANT ALL ON turing_test.* TO 'travis'@'%'"
 
 script:
   - npm test
 
 after_success:
-- npm run coverage
+  - npm run coverage
 
 after_script:
-- ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
+mysql:
+  - adapter: mysql2
+  - username: root
+  - encoding: utf8
+  - database: turing_test
