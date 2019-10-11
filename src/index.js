@@ -44,8 +44,4 @@ if (NODE_ENV !== 'test') {
   app.listen(port, () => log(`Server is running on http://localhost:${port}`));
 }
 
-/* export const server = app.listen(port, () => {
-  log(`Server is running on http://localhost:${port}`);
-}); */
-
 export default app;
