@@ -25,10 +25,7 @@ class CustomerController {
         accessToken: token,
       });
     } catch (error) {
-      return res.status(500).json({
-        message: 'this sucks',
-        error: error.message
-      });
+      return res.status(500).json({ error: error.message });
     }
   }
 }
