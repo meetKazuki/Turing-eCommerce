@@ -1,9 +1,7 @@
-import bcrypt from 'bcryptjs';
 import { config } from 'dotenv';
 import jwt from 'jsonwebtoken';
 
 config();
-const salt = +process.env.SALT;
 const secret = process.env.JWT_KEY;
 
 export const generateToken = (payload) => {
@@ -11,8 +9,4 @@ export const generateToken = (payload) => {
   return token;
 };
 
-export const hashPassword = (password) => bcrypt.hashSync(password, salt);
-
-export const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
-
-export default { generateToken, hashPassword, verifyPassword };
+export default { generateToken };

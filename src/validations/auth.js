@@ -13,7 +13,7 @@ export default {
     check('email')
       .isEmail()
       .withMessage('Enter a valid email address')
-      .customSanitizer(email => email.toLowerCase()),
+      .customSanitizer(value => value.toLowerCase()),
 
     check('password')
       .trim()
@@ -22,5 +22,21 @@ export default {
       .withMessage('Password should be between 8 to 15 characters')
       .isAlphanumeric()
       .withMessage('Password must be alphanumeric')
+  ],
+
+  signinSchema: [
+    check('email')
+      .trim()
+      .exists().withMessage('Email address is required')
+      .isEmail()
+      .withMessage('Enter a valid email address')
+      .customSanitizer(value => value.toLowerCase()),
+
+    check('password')
+      .trim()
+      .exists()
+      .withMessage('Password is required')
+      .isLength({ min: 8, max: 15 })
+      .withMessage('Password should be between 8 to 15 characters')
   ]
 };

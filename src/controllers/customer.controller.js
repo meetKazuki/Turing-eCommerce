@@ -28,6 +28,38 @@ class CustomerController {
       return res.status(500).json({ error: error.message });
     }
   }
+
+  /**
+   * log in a customer
+   *
+   * @static
+   * @param {object} req express request object
+   * @param {object} res express response object
+   * @returns {json} json object with status, and access token
+   * @memberof CustomerController
+   */
+  static async login(req, res) {
+    const { email, password } = req.body;
+
+    const user = await Customer.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).json({
+        error: 'The email doesn\'t exist'
+      });
+    }
+    const isPassword = await user.validatePassword(password);
+    if (!isPassword) {
+      return res.status(401).json({ error: 'Email or Password is invalid' });
+    }
+
+    const token = generateToken({ user });
+    const customerDetails = await user.getSafeDataValues();
+
+    return res.status(200).json({
+      customer: customerDetails,
+      accessToken: token,
+    });
+  }
 }
 
 export default CustomerController;
