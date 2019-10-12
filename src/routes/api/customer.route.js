@@ -6,13 +6,19 @@ import validator from '../../middleware/validator';
 
 const router = Router();
 const { checkExistingUser } = authentication;
-const { signupSchema } = schemas;
+const { signupSchema, signinSchema } = schemas;
 
 router.post(
-  '/customers/signup',
+  '/customers',
   validator(signupSchema),
   checkExistingUser,
   CustomerController.create
+);
+
+router.post(
+  '/customers/login',
+  validator(signinSchema),
+  CustomerController.login
 );
 
 export default router;
