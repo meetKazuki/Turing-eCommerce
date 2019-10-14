@@ -5,7 +5,7 @@ import schemas from '../../validations/auth';
 import validator from '../../middleware/validator';
 
 const router = Router();
-const { checkExistingUser } = authentication;
+const { checkExistingUser, verifyToken } = authentication;
 const { signupSchema, signinSchema } = schemas;
 
 router.post(
@@ -19,6 +19,12 @@ router.post(
   '/customers/login',
   validator(signinSchema),
   CustomerController.login
+);
+
+router.get(
+  '/customers',
+  verifyToken,
+  CustomerController.getCustomerProfile
 );
 
 export default router;
