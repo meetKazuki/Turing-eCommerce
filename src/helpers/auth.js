@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken';
 config();
 const secret = process.env.JWT_KEY;
 
-export const generateToken = (payload) => {
-  const token = jwt.sign(payload, secret, { expiresIn: '24h' });
+// eslint-disable-next-line camelcase
+const generateToken = ({ customer_id, email }) => {
+  const token = jwt.sign({ customer_id, email }, secret, { expiresIn: '24h' });
   return token;
 };
 
-export default { generateToken };
+export default generateToken;
