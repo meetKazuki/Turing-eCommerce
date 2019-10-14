@@ -1,10 +1,10 @@
 import chai from 'chai';
 import request from 'supertest';
 import app from '../../../index';
-
 import { user } from '../mocks/users.mock';
 
 const { expect } = chai;
+let customerToken;
 
 describe('Authentication Route', () => {
   describe('Signup route', () => {
@@ -104,6 +104,55 @@ describe('Authentication Route', () => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('error');
           expect(error).to.eql('Email or Password is invalid');
+          done(err);
+        });
+    });
+  });
+});
+
+describe('Customer Routes', () => {
+  beforeEach(done => {
+    request(app)
+      .post('/customers/login')
+      .send({ email: user.email, password: user.password })
+      .end((err, res) => {
+        customerToken = res.body.accessToken;
+        done(err);
+      });
+  });
+
+  describe('GET Customer details', () => {
+    it('should retrieve customer details successfully', (done) => {
+      request(app)
+        .get('/customers')
+        .set('authorization', `Bearer ${customerToken}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.property('customerDetails');
+          done(err);
+        });
+    });
+
+    it('should throw an error if authorization header is not set', (done) => {
+      request(app)
+        .get('/customers')
+        .end((err, res) => {
+          expect(res.status).to.equal(412);
+          expect(res.body.status).to.eql('error');
+          expect(res.body.message).to.eql('Authorization header not set');
+          done(err);
+        });
+    });
+
+    it('should throw an error if token is empty', (done) => {
+      request(app)
+        .get('/customers')
+        .set('authorization', 'Bearer ')
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          expect(res.body.status).to.eql('error');
+          expect(res.body.message).to.eql('jwt must be provided');
           done(err);
         });
     });
