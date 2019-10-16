@@ -8,12 +8,16 @@ export default {
       .trim()
       .isLength({ min: 2 })
       .withMessage('Name should not be less than 2 characters')
+      .matches(/^[A-Za-z ]+$/)
+      .withMessage('name must contain only letters and spaces')
       .customSanitizer(value => capitalize(value)),
 
     check('email')
+      .trim()
+      .exists().withMessage('Email address is required')
       .isEmail()
       .withMessage('Enter a valid email address')
-      .customSanitizer(value => value.toLowerCase()),
+      .customSanitizer(email => email.toLowerCase()),
 
     check('password')
       .trim()

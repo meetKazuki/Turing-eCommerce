@@ -1,7 +1,7 @@
 import chai from 'chai';
 import request from 'supertest';
 import app from '../../../index';
-import { user } from '../mocks/users.mock';
+import { user, phone } from '../mocks/users.mock';
 
 const { expect } = chai;
 let customerToken;
@@ -13,13 +13,16 @@ describe('Authentication Route', () => {
         .post('/customers')
         .send(user)
         .end((err, res) => {
-          const { customer, accessToken } = res.body;
+          const { status, message, data } = res.body;
           expect(res.status).to.equal(201);
-          expect(customer).to.be.an('object');
-          expect(customer).to.have.property('name');
-          expect(customer).to.have.property('email');
-          expect(customer).to.not.have.property('password');
-          expect(accessToken).to.be.a('string');
+          expect(status).to.eql('success');
+          expect(message).to.eql('Sign-up successfully');
+          expect(data).to.be.an('object');
+          expect(data).to.have.property('newCustomer');
+          expect(data.newCustomer).to.have.property('name');
+          expect(data.newCustomer).to.have.property('email');
+          expect(data.newCustomer).to.not.have.property('password');
+          expect(data).to.have.property('token');
           done(err);
         });
     });
@@ -36,9 +39,7 @@ describe('Authentication Route', () => {
           done(err);
         });
     });
-  });
 
-  describe('Signup route validation', () => {
     it('should throw an error if name is not supplied', (done) => {
       request(app)
         .post('/customers')
@@ -72,12 +73,17 @@ describe('Authentication Route', () => {
         .post('/customers/login')
         .send({ email: user.email, password: user.password })
         .end((err, res) => {
-          const { customer, accessToken } = res.body;
+          const { status, message, data } = res.body;
           expect(res.status).to.equal(200);
-          expect(res.body).to.have.property('customer');
-          expect(res.body).to.have.property('accessToken');
-          expect(customer).to.be.an('object');
-          expect(accessToken).to.be.a('string');
+          expect(status).to.eql('success');
+          expect(message).to.eql('User log-in successful');
+          expect(data).to.be.an('object');
+          expect(data).to.have.property('customer');
+          expect(data.customer).to.have.property('name');
+          expect(data.customer).to.have.property('email');
+          expect(data.customer).to.not.have.property('password');
+          expect(data).to.have.property('token');
+          // customerToken = data.token;
           done(err);
         });
     });
@@ -87,10 +93,10 @@ describe('Authentication Route', () => {
         .post('/customers/login')
         .send({ email: 'backend@turing.com', password: user.password })
         .end((err, res) => {
-          const { error } = res.body;
+          const { status, message } = res.body;
           expect(res.status).to.equal(401);
-          expect(res.body).to.have.property('error');
-          expect(error).to.eql('The email doesn\'t exist');
+          expect(status).to.eql('error');
+          expect(message).to.eql('Email or Password is incorrect');
           done(err);
         });
     });
@@ -100,10 +106,10 @@ describe('Authentication Route', () => {
         .post('/customers/login')
         .send({ email: user.email, password: 'saligia1993' })
         .end((err, res) => {
-          const { error } = res.body;
+          const { status, message } = res.body;
           expect(res.status).to.equal(401);
-          expect(res.body).to.have.property('error');
-          expect(error).to.eql('Email or Password is invalid');
+          expect(status).to.eql('error');
+          expect(message).to.eql('Email or Password is incorrect');
           done(err);
         });
     });
@@ -116,7 +122,7 @@ describe('Customer Routes', () => {
       .post('/customers/login')
       .send({ email: user.email, password: user.password })
       .end((err, res) => {
-        customerToken = res.body.accessToken;
+        customerToken = res.body.data.token;
         done(err);
       });
   });
@@ -125,11 +131,14 @@ describe('Customer Routes', () => {
     it('should retrieve customer details successfully', (done) => {
       request(app)
         .get('/customers')
-        .set('authorization', `Bearer ${customerToken}`)
+        .set('user-key', customerToken)
         .end((err, res) => {
+          const { status, message, data } = res.body;
           expect(res.status).to.equal(200);
-          expect(res.body).to.be.an('object');
-          expect(res.body).to.have.property('customerDetails');
+          expect(status).to.eql('success');
+          expect(message).to.eql('Customer details retrieved successfully');
+          expect(data).to.be.an('object');
+          expect(data).to.not.have.property('password');
           done(err);
         });
     });
@@ -148,11 +157,69 @@ describe('Customer Routes', () => {
     it('should throw an error if token is empty', (done) => {
       request(app)
         .get('/customers')
-        .set('authorization', 'Bearer ')
+        .set('user-key', 'Bearer ')
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body.status).to.eql('error');
           expect(res.body.message).to.eql('jwt must be provided');
+          done(err);
+        });
+    });
+  });
+
+  describe('UPDATE Customer details', () => {
+    it('should update customer phone contacts successfully', (done) => {
+      request(app)
+        .put('/customer')
+        .send({ ...phone })
+        .set('user-key', customerToken)
+        .end((err, res) => {
+          const { data } = res.body;
+          expect(res.status).to.equal(200);
+          expect(data.day_phone).to.equal(phone.day_phone);
+          expect(data.eve_phone).to.equal(phone.eve_phone);
+          expect(data.mob_phone).to.equal(phone.mob_phone);
+          done(err);
+        });
+    });
+
+    it('should throw an error if an empty request is made', (done) => {
+      request(app)
+        .put('/customer')
+        .send({})
+        .set('user-key', customerToken)
+        .end((err, res) => {
+          const { status, message } = res.body;
+          expect(res.status).to.equal(400);
+          expect(status).to.eql('error');
+          expect(message).to.eql('Request body cannot be empty');
+          done(err);
+        });
+    });
+
+    it('should throw an error if a token is not provided', (done) => {
+      request(app)
+        .put('/customer')
+        .send({})
+        .end((err, res) => {
+          const { status, message } = res.body;
+          expect(res.status).to.equal(412);
+          expect(status).to.eql('error');
+          expect(message).to.eql('Authorization header not set');
+          done(err);
+        });
+    });
+
+    it('should throw an error if token is invalid', (done) => {
+      request(app)
+        .put('/customer')
+        .send({ ...phone })
+        .set('user-key', `${customerToken}invalid`)
+        .end((err, res) => {
+          const { status, message } = res.body;
+          expect(res.status).to.equal(401);
+          expect(status).to.eql('error');
+          expect(message).to.eql('invalid signature');
           done(err);
         });
     });

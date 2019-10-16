@@ -48,12 +48,13 @@ class Response {
       data: this.data,
     };
 
-    if (this.type === 'success') {
-      return res.status(this.statusCode).json(result);
+    if (this.type === 'error') {
+      return res.status(this.statusCode).json({
+        status: this.type,
+        message: this.message
+      });
     }
-    return res.status(this.statusCode).json({
-      status: this.type, message: this.message
-    });
+    return res.status(this.statusCode).json(result);
   }
 }
 
