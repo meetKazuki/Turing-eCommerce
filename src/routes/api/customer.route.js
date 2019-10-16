@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import authentication from '../../middleware/auth';
 import CustomerController from '../../controllers/customer.controller';
-import schemas from '../../validations/auth';
+import authSchemas from '../../validations/auth';
+import customerSchemas from '../../validations/customer';
 import validator from '../../middleware/validator';
 
 const router = Router();
 const { checkExistingUser, verifyToken } = authentication;
-const { signupSchema, signinSchema } = schemas;
+const { signupSchema, signinSchema } = authSchemas;
+const { customerUpdateSchema } = customerSchemas;
 
 router.post(
   '/customers',
@@ -25,6 +27,13 @@ router.get(
   '/customers',
   verifyToken,
   CustomerController.getCustomerProfile
+);
+
+router.put(
+  '/customer',
+  verifyToken,
+  validator(customerUpdateSchema),
+  CustomerController.updateCustomerProfile
 );
 
 export default router;

@@ -7,7 +7,7 @@
     "build": "npm run clean && npm run build:babel",
     "build:babel": "cross-env babel src -d build --copy-files",
     "clean": "rm -rf build .nyc_output build coverage && mkdir build",
-    "coverage": "npm run db:migrate && jest --coverage --detectOpenHandles --runInBand && cat ./coverage/lcov.info | coveralls",
+    "coverage": "npm test && cat ./coverage/lcov.info | coveralls",
     "db:migrate": "babel-node ./src/test/migrate.js",
     "dev": "nodemon --watch src --exec babel-node ./src/index.js",
     "start": "node build/index.js",

@@ -1,5 +1,7 @@
 import { Customer } from '../database/models';
 import generateToken from '../helpers/auth';
+import isEmptyObject from '../helpers/isEmptyObject';
+import Response from '../helpers/response';
 
 /**
  * @class CustomerController
@@ -16,16 +18,19 @@ class CustomerController {
    */
   static async create(req, res) {
     try {
-      const newCustomer = await Customer.create(req.body);
-      const customerDetails = await newCustomer.getSafeDataValues();
-      const token = generateToken(newCustomer);
+      const customer = await Customer.create(req.body);
+      const newCustomer = await customer.getSafeDataValues();
+      const token = `Bearer ${generateToken(newCustomer)}`;
 
-      return res.status(201).json({
-        customer: customerDetails,
-        accessToken: token,
-      });
+      Response.setSuccess(
+        201,
+        'Sign-up successfully',
+        { newCustomer, token }
+      );
+      return Response.send(res);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      Response.setError(500, error.message);
+      return Response.send(res);
     }
   }
 
@@ -43,22 +48,23 @@ class CustomerController {
 
     const user = await Customer.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({
-        error: 'The email doesn\'t exist'
-      });
+      Response.setError(401, 'Email or Password is incorrect');
+      return Response.send(res);
     }
     const isPassword = await user.validatePassword(password);
     if (!isPassword) {
-      return res.status(401).json({ error: 'Email or Password is invalid' });
+      Response.setError(401, 'Email or Password is incorrect');
+      return Response.send(res);
     }
 
-    const token = generateToken(user);
-    const customerDetails = await user.getSafeDataValues();
-
-    return res.status(200).json({
-      customer: customerDetails,
-      accessToken: token,
-    });
+    const token = `Bearer ${generateToken(user)}`;
+    const customer = await user.getSafeDataValues();
+    Response.setSuccess(
+      200,
+      'User log-in successful',
+      { customer, token }
+    );
+    return Response.send(res);
   }
 
   /**
@@ -71,17 +77,54 @@ class CustomerController {
    * @returns {json} json object with status customer profile data
    * @memberof CustomerController
    */
-  static async getCustomerProfile(req, res, next) {
+  static async getCustomerProfile(req, res) {
     const { customer_id } = req.user;  // eslint-disable-line
     try {
-      const customer = await Customer.findByPk(customer_id);
-      const customerDetails = await customer.getSafeDataValues();
-      return res.status(200).json({
-        customerDetails,
-      });
+      const user = await Customer.findByPk(customer_id);
+      const customer = await user.getSafeDataValues();
+      Response.setSuccess(
+        200,
+        'Customer details retrieved successfully',
+        customer
+      );
+      return Response.send(res);
     } catch (error) {
-      return next(error);
+      Response.setError(500, error.message);
+      return Response.send(res);
     }
+  }
+
+  /**
+   * update customer profile data
+   * such as name, email, password, day_phone, eve_phone and mob_phone
+   *
+   * @static
+   * @param {object} req express request object
+   * @param {object} res express response object
+   * @returns {json} json object with status customer profile data
+   * @memberof CustomerController
+   */
+  static async updateCustomerProfile(req, res) {
+    const { customer_id } = req.user;  // eslint-disable-line
+    const payload = req.body;
+
+    if (isEmptyObject(payload)) {
+      Response.setError(400, 'Request body cannot be empty');
+      return Response.send(res);
+    }
+
+    const user = await Customer.findByPk(customer_id);
+    const updatedCustomer = await user.update(
+      { ...payload },
+      { where: { customer_id }, returning: true }
+    );
+
+    Response.setSuccess(
+      200,
+      'Customer details updated successfully',
+      updatedCustomer
+    );
+    return Response.send(res);
   }
 }
 
