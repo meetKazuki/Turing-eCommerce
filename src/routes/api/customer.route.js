@@ -8,7 +8,9 @@ import validator from '../../middleware/validator';
 const router = Router();
 const { checkExistingUser, verifyToken } = authentication;
 const { signupSchema, signinSchema } = authSchemas;
-const { customerUpdateSchema } = customerSchemas;
+const {
+  profileUpdateSchema, addressUpdateSchema, cardUpdateSchema
+} = customerSchemas;
 
 router.post(
   '/customers',
@@ -32,8 +34,22 @@ router.get(
 router.put(
   '/customer',
   verifyToken,
-  validator(customerUpdateSchema),
-  CustomerController.updateCustomerProfile
+  validator(profileUpdateSchema),
+  CustomerController.updateCustomer
+);
+
+router.put(
+  '/customer/address',
+  verifyToken,
+  validator(addressUpdateSchema),
+  CustomerController.updateCustomer
+);
+
+router.put(
+  '/customer/creditCard',
+  verifyToken,
+  validator(cardUpdateSchema),
+  CustomerController.updateCustomer
 );
 
 export default router;
