@@ -24,12 +24,12 @@ class CustomerController {
 
       Response.setSuccess(
         201,
-        'Sign-up successfully',
+        'sign-up successfully',
         { newCustomer, token }
       );
       return Response.send(res);
     } catch (error) {
-      Response.setError(500, error.message);
+      Response.setError(500, 'server error');
       return Response.send(res);
     }
   }
@@ -48,12 +48,12 @@ class CustomerController {
 
     const user = await Customer.findOne({ where: { email } });
     if (!user) {
-      Response.setError(401, 'Email or Password is incorrect');
+      Response.setError(401, 'email or password is incorrect');
       return Response.send(res);
     }
     const isPassword = await user.validatePassword(password);
     if (!isPassword) {
-      Response.setError(401, 'Email or Password is incorrect');
+      Response.setError(401, 'email or password is incorrect');
       return Response.send(res);
     }
 
@@ -61,7 +61,7 @@ class CustomerController {
     const customer = await user.getSafeDataValues();
     Response.setSuccess(
       200,
-      'User log-in successful',
+      'user log-in successful',
       { customer, token }
     );
     return Response.send(res);
@@ -73,7 +73,6 @@ class CustomerController {
    * @static
    * @param {object} req express request object
    * @param {object} res express response object
-   * @param {object} next next middleware
    * @returns {json} json object with status customer profile data
    * @memberof CustomerController
    */
@@ -84,12 +83,12 @@ class CustomerController {
       const customer = await user.getSafeDataValues();
       Response.setSuccess(
         200,
-        'Customer details retrieved successfully',
+        'customer details retrieved successfully',
         customer
       );
       return Response.send(res);
     } catch (error) {
-      Response.setError(500, error.message);
+      Response.setError(500, 'server error');
       return Response.send(res);
     }
   }
@@ -104,27 +103,39 @@ class CustomerController {
    * @returns {json} json object with status customer profile data
    * @memberof CustomerController
    */
-  static async updateCustomerProfile(req, res) {
-    const { customer_id } = req.user;  // eslint-disable-line
+  static async updateCustomer(req, res) {
+    const { customer_id } = req.user; //eslint-disable-line
     const payload = req.body;
+    const type = req.url.split('/')[2];
+    let user;
+    let updatedCustomer;
 
-    if (isEmptyObject(payload)) {
-      Response.setError(400, 'Request body cannot be empty');
+    try {
+      if (isEmptyObject(payload)) {
+        Response.setError(400, 'request body cannot be empty');
+        return Response.send(res);
+      }
+      switch (type) {
+        case 'creditCard':
+        case 'address':
+        default:
+          user = await Customer.findByPk(customer_id);
+          updatedCustomer = await user.update(
+            { ...payload },
+            { where: { customer_id }, returning: true }
+          );
+          break;
+      }
+      Response.setSuccess(
+        200,
+        'update successful',
+        updatedCustomer.getSafeDataValues()
+      );
+      return Response.send(res);
+    } catch (error) {
+      Response.setError(500, 'server error');
       return Response.send(res);
     }
-
-    const user = await Customer.findByPk(customer_id);
-    const updatedCustomer = await user.update(
-      { ...payload },
-      { where: { customer_id }, returning: true }
-    );
-
-    Response.setSuccess(
-      200,
-      'Customer details updated successfully',
-      updatedCustomer
-    );
-    return Response.send(res);
   }
 }
 

@@ -10,13 +10,13 @@ const updatedUser = {
 };
 
 const address = {
-  address1: 'Block 0, Flat 0',
-  address2: 'That town',
+  address_1: 'Block 0, Flat 0',
+  address_2: '12 Mcneil Street',
   city: 'universe city',
   region: 'rest of the world',
-  postalCode: 10000,
+  postal_code: 10000,
   country: 'Global',
-  shippingRegionId: 4,
+  shipping_region_id: 4,
 };
 
 const phone = {
@@ -25,6 +25,18 @@ const phone = {
   mob_phone: '+678954321',
 };
 
+const card = {
+  credit_card: '4299908212121245'
+};
+const invalidCard = {
+  credit_card: '4000909012'
+};
+
 export {
-  user, updatedUser, address, phone
+  user,
+  updatedUser,
+  address,
+  phone,
+  card,
+  invalidCard
 };
