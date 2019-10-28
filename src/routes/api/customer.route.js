@@ -20,6 +20,11 @@ router.post(
 );
 
 router.post(
+  'customers/:provider',
+  CustomerController.socialLogin
+);
+
+router.post(
   '/customers/login',
   validator(signinSchema),
   CustomerController.login

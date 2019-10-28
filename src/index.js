@@ -26,9 +26,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(router);
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  // eslint-disable-line no-unused-vars
+app.use((err, req, res, next) => { // eslint-disable-line
   return res.status(err.status || 500).json({
     error: {
       message: err.message,

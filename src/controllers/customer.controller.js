@@ -2,6 +2,7 @@ import { Customer } from '../database/models';
 import generateToken from '../helpers/auth';
 import isEmptyObject from '../helpers/isEmptyObject';
 import Response from '../helpers/response';
+import { createOrFindUser, facebookAuth } from '../services/auth';
 
 /**
  * @class CustomerController
@@ -68,6 +69,30 @@ class CustomerController {
   }
 
   /**
+   * Handles user sign up and sign in using their social media accounts
+   *
+   * - Facebook login
+   * - Google login
+   *
+   * @function
+   *
+   * @param {object} req - the request object to the server
+   * @param {object} res - express response object
+   * @returns {json} - response object
+   */
+  static async socialLogin(req, res) {
+    const { provider } = req.params;
+    const providerHandle = {
+      facebook: facebookAuth,
+      // google: googleAuth
+    };
+    const userDetails = await providerHandle[provider](req.body);
+    const { status, data } = await createOrFindUser(userDetails);
+
+    return res.status(status).json({ status: 'success', data });
+  }
+
+  /**
    * get customer profile data
    *
    * @static
@@ -105,8 +130,8 @@ class CustomerController {
    */
   static async updateCustomer(req, res) {
     const { customer_id } = req.user; //eslint-disable-line
-    const payload = req.body;
     const type = req.url.split('/')[2];
+    const payload = req.body;
     let user;
     let updatedCustomer;
 

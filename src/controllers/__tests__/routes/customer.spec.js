@@ -11,38 +11,6 @@ let customerToken;
 
 describe('Authentication Route', () => {
   describe('Signup route', () => {
-    it('should successfully POST to signup route', (done) => {
-      request(app)
-        .post('/customers')
-        .send(user)
-        .end((err, res) => {
-          const { status, message, data } = res.body;
-          expect(res.status).to.equal(201);
-          expect(status).to.eql('success');
-          expect(message).to.eql('sign-up successfully');
-          expect(data).to.be.an('object');
-          expect(data).to.have.property('newCustomer');
-          expect(data.newCustomer).to.have.property('name');
-          expect(data.newCustomer).to.have.property('email');
-          expect(data.newCustomer).to.not.have.property('password');
-          expect(data).to.have.property('token');
-          done(err);
-        });
-    });
-
-    it('should throw an error if user already exists', (done) => {
-      request(app)
-        .post('/customers')
-        .send(user)
-        .end((err, res) => {
-          const { status, message } = res.body;
-          expect(res.status).to.equal(409);
-          expect(status).to.eql('error');
-          expect(message).to.eql('user already exist');
-          done(err);
-        });
-    });
-
     it('should throw an error if name is not supplied', (done) => {
       request(app)
         .post('/customers')
@@ -65,6 +33,39 @@ describe('Authentication Route', () => {
           expect(res.status).to.equal(400);
           expect(status).to.eql('error');
           expect(message.email).to.eql('enter a valid email address');
+          done(err);
+        });
+    });
+
+    it('should successfully POST to signup route', (done) => {
+      request(app)
+        .post('/customers')
+        .send(user)
+        .end((err, res) => {
+          const { status, message, data } = res.body;
+          expect(res.status).to.equal(201);
+          expect(status).to.eql('success');
+          expect(message).to.eql('sign-up successfully');
+          expect(data).to.be.an('object');
+          expect(data).to.have.property('newCustomer');
+          expect(data.newCustomer).to.have.property('name');
+          expect(data.newCustomer).to.have.property('email');
+          expect(data.newCustomer).to.not.have.property('password');
+          expect(data).to.have.property('token');
+          expect(data.token).to.not.equal(null);
+          done(err);
+        });
+    });
+
+    it('should throw an error if user already exists', (done) => {
+      request(app)
+        .post('/customers')
+        .send(user)
+        .end((err, res) => {
+          const { status, message } = res.body;
+          expect(res.status).to.equal(409);
+          expect(status).to.eql('error');
+          expect(message).to.eql('user already exist');
           done(err);
         });
     });
@@ -112,7 +113,6 @@ describe('Authentication Route', () => {
           expect(data.customer).to.have.property('email');
           expect(data.customer).to.not.have.property('password');
           expect(data).to.have.property('token');
-          // customerToken = data.token;
           done(err);
         });
     });

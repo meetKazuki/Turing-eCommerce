@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
+    "axios": "^0.19.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",
@@ -59,6 +60,7 @@
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.9.1",
     "mysql2": "^1.7.0",
+    "passport": "^0.4.0",
     "sequelize": "^5.19.3",
     "sequelize-cli": "^5.5.1"
   }
