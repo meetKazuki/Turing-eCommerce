@@ -1,8 +1,6 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import request from 'supertest';
 import app from '../../../index';
-
-const { expect } = chai;
 
 describe('Welcome routes', () => {
   it('should return a welcome message on index route', (done) => {

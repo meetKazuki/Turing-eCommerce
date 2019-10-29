@@ -1,5 +1,5 @@
 import { matchedData, validationResult } from 'express-validator';
-import Response from '../helpers/response';
+import response from '../helpers/response';
 
 export default (schemas) => {
   const validatorCheck = (req, res, next) => {
@@ -15,8 +15,8 @@ export default (schemas) => {
             return accumulator;
           }, {}
         );
-      Response.setError(400, mapErrors);
-      return Response.send(res);
+      response.setError(400, mapErrors);
+      return response.send(res);
     }
     return next();
   };

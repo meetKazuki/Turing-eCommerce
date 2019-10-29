@@ -1,7 +1,7 @@
 import { Customer } from '../database/models';
 import generateToken from '../helpers/auth';
 import isEmptyObject from '../helpers/isEmptyObject';
-import Response from '../helpers/response';
+import response from '../helpers/response';
 
 /**
  * @class CustomerController
@@ -22,15 +22,15 @@ class CustomerController {
       const newCustomer = await customer.getSafeDataValues();
       const token = `Bearer ${generateToken(newCustomer)}`;
 
-      Response.setSuccess(
+      response.setSuccess(
         201,
         'sign-up successfully',
         { newCustomer, token }
       );
-      return Response.send(res);
+      return response.send(res);
     } catch (error) {
-      Response.setError(500, 'server error');
-      return Response.send(res);
+      response.setError(500, 'server error');
+      return response.send(res);
     }
   }
 
@@ -48,23 +48,23 @@ class CustomerController {
 
     const user = await Customer.findOne({ where: { email } });
     if (!user) {
-      Response.setError(401, 'email or password is incorrect');
-      return Response.send(res);
+      response.setError(401, 'email or password is incorrect');
+      return response.send(res);
     }
     const isPassword = await user.validatePassword(password);
     if (!isPassword) {
-      Response.setError(401, 'email or password is incorrect');
-      return Response.send(res);
+      response.setError(401, 'email or password is incorrect');
+      return response.send(res);
     }
 
     const token = `Bearer ${generateToken(user)}`;
     const customer = await user.getSafeDataValues();
-    Response.setSuccess(
+    response.setSuccess(
       200,
       'user log-in successful',
       { customer, token }
     );
-    return Response.send(res);
+    return response.send(res);
   }
 
   /**
@@ -81,15 +81,15 @@ class CustomerController {
     try {
       const user = await Customer.findByPk(customer_id);
       const customer = await user.getSafeDataValues();
-      Response.setSuccess(
+      response.setSuccess(
         200,
-        'customer details retrieved successfully',
+        'retrieval successful',
         customer
       );
-      return Response.send(res);
+      return response.send(res);
     } catch (error) {
-      Response.setError(500, 'server error');
-      return Response.send(res);
+      response.setError(500, 'server error');
+      return response.send(res);
     }
   }
 
@@ -112,8 +112,8 @@ class CustomerController {
 
     try {
       if (isEmptyObject(payload)) {
-        Response.setError(400, 'request body cannot be empty');
-        return Response.send(res);
+        response.setError(400, 'request body cannot be empty');
+        return response.send(res);
       }
       switch (type) {
         case 'creditCard':
@@ -126,15 +126,15 @@ class CustomerController {
           );
           break;
       }
-      Response.setSuccess(
+      response.setSuccess(
         200,
         'update successful',
         updatedCustomer.getSafeDataValues()
       );
-      return Response.send(res);
+      return response.send(res);
     } catch (error) {
-      Response.setError(500, 'server error');
-      return Response.send(res);
+      response.setError(500, 'server error');
+      return response.send(res);
     }
   }
 }

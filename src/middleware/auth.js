@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { Customer } from '../database/models';
-import Response from '../helpers/response';
+import response from '../helpers/response';
 
 config();
 
@@ -11,22 +11,22 @@ export default {
   verifyToken: (req, res, next) => {
     const authHeader = req.headers['user-key'];
     if (!authHeader) {
-      Response.setError(412, 'authorization header not set');
-      return Response.send(res);
+      response.setError(412, 'authorization header not set');
+      return response.send(res);
     }
 
     const token = authHeader.split(' ')[1];
     jwt.verify(token, JWT_KEY, async (error, decodedToken) => {
       if (error) {
-        Response.setError(401, `${error.message}`);
-        return Response.send(res);
+        response.setError(401, `${error.message}`);
+        return response.send(res);
       }
 
       const { customer_id: userId } = decodedToken;
       const user = await Customer.findByPk(userId);
       if (!user) {
-        Response.setError(403, 'invalid credentials');
-        return Response.send(res);
+        response.setError(403, 'invalid credentials');
+        return response.send(res);
       }
 
       req.user = user;
@@ -38,8 +38,8 @@ export default {
     const { email } = req.body;
     const user = await Customer.findOne({ where: { email } });
     if (user) {
-      Response.setError(409, 'user already exist');
-      return Response.send(res);
+      response.setError(409, 'user already exist');
+      return response.send(res);
     }
     return next();
   },

@@ -1,12 +1,12 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import request from 'supertest';
-import app from '../../../index';
+
+import app from '../../..';
 import capitalize from '../../../helpers/capitalize';
 import {
   user, phone, card, invalidCard, address
 } from '../mocks/users.mock';
 
-const { expect } = chai;
 let customerToken;
 
 describe('Authentication Route', () => {
@@ -112,7 +112,6 @@ describe('Authentication Route', () => {
           expect(data.customer).to.have.property('email');
           expect(data.customer).to.not.have.property('password');
           expect(data).to.have.property('token');
-          // customerToken = data.token;
           done(err);
         });
     });
@@ -162,7 +161,7 @@ describe('Customer Routes', () => {
           const { status, message, data } = res.body;
           expect(res.status).to.equal(200);
           expect(status).to.eql('success');
-          expect(message).to.eql('customer details retrieved successfully');
+          expect(message).to.eql('retrieval successful');
           expect(data).to.be.an('object');
           expect(data).to.not.have.property('password');
           done(err);
