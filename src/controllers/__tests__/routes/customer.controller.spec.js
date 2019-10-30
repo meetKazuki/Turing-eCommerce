@@ -1,10 +1,12 @@
 import { expect } from 'chai';
 import request from 'supertest';
+import sinon from 'sinon';
 
 import app from '../../..';
 import capitalize from '../../../helpers/capitalize';
+import { Customer } from '../../../database/models';
 import {
-  user, phone, card, invalidCard, address
+  user, user_2, phone, card, invalidCard, address
 } from '../mocks/users.mock';
 
 let customerToken;
@@ -68,6 +70,21 @@ describe('Authentication Route', () => {
           done(err);
         });
     });
+
+    it('should return appropriate status if an error occurs on the server', done => {
+      const stub = sinon
+        .stub(Customer, 'create')
+        .rejects(new Error('server error'));
+      request(app)
+        .post('/customers')
+        .send(user_2)
+        .set('Content-Type', 'application/json')
+        .end((error, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done(error);
+        });
+    });
   });
 
   describe('Signin route', () => {
@@ -129,46 +146,6 @@ describe('Customer Routes', () => {
       });
   });
 
-  describe('GET Customer details', () => {
-    it('should throw an error if authorization header is not set', (done) => {
-      request(app)
-        .get('/customers')
-        .end((err, res) => {
-          expect(res.status).to.equal(412);
-          expect(res.body.status).to.eql('error');
-          expect(res.body.message).to.eql('authorization header not set');
-          done(err);
-        });
-    });
-
-    it('should throw an error if token is empty', (done) => {
-      request(app)
-        .get('/customers')
-        .set('user-key', 'Bearer ')
-        .end((err, res) => {
-          expect(res.status).to.equal(401);
-          expect(res.body.status).to.eql('error');
-          expect(res.body.message).to.eql('jwt must be provided');
-          done(err);
-        });
-    });
-
-    it('should retrieve customer details successfully', (done) => {
-      request(app)
-        .get('/customers')
-        .set('user-key', customerToken)
-        .end((err, res) => {
-          const { status, message, data } = res.body;
-          expect(res.status).to.equal(200);
-          expect(status).to.eql('success');
-          expect(message).to.eql('retrieval successful');
-          expect(data).to.be.an('object');
-          expect(data).to.not.have.property('password');
-          done(err);
-        });
-    });
-  });
-
   describe('UPDATE Customer profile information', () => {
     it('should throw an error if an empty request is made', (done) => {
       request(app)
@@ -222,6 +199,21 @@ describe('Customer Routes', () => {
           expect(data.day_phone).to.equal(phone.day_phone);
           expect(data.eve_phone).to.equal(phone.eve_phone);
           expect(data.mob_phone).to.equal(phone.mob_phone);
+          done(err);
+        });
+    });
+
+    it.skip('should return appropriate status if error occurs on server', done => {
+      const stub = sinon
+        .stub(Customer, 'update')
+        .rejects(new Error('server error'));
+      request(app)
+        .put('/customer/address')
+        .set('user-key', customerToken)
+        .send({ ...address })
+        .end((err, res) => {
+          expect(res.status).to.equal(500);
+          stub.restore();
           done(err);
         });
     });
@@ -332,6 +324,62 @@ describe('Customer Routes', () => {
           expect(parseInt(data.shipping_region_id, 10))
             .to.equal(parseInt(address.shipping_region_id, 10));
           done(err);
+        });
+    });
+  });
+
+  describe('GET Customer details', () => {
+    it('should throw an error if authorization header is not set', (done) => {
+      request(app)
+        .get('/customers')
+        .end((err, res) => {
+          expect(res.status).to.equal(412);
+          expect(res.body.status).to.eql('error');
+          expect(res.body.message).to.eql('authorization header not set');
+          done(err);
+        });
+    });
+
+    it('should throw an error if token is empty', (done) => {
+      request(app)
+        .get('/customers')
+        .set('user-key', 'Bearer ')
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          expect(res.body.status).to.eql('error');
+          expect(res.body.message).to.eql('jwt must be provided');
+          done(err);
+        });
+    });
+
+    it('should retrieve customer details successfully', (done) => {
+      request(app)
+        .get('/customers')
+        .set('user-key', customerToken)
+        .end((err, res) => {
+          const { status, message, data } = res.body;
+          expect(res.status).to.equal(200);
+          expect(status).to.eql('success');
+          expect(message).to.eql('retrieval successful');
+          expect(data).to.be.an('object');
+          expect(data).to.not.have.property('password');
+          done(err);
+        });
+    });
+
+    it.skip('should return appropriate status if an error occurs on the server', done => {
+      const stub = sinon
+        .stub(Customer, 'findByPk')
+        .rejects(new Error('server error'));
+      request(app)
+        .get('/customers')
+        .set('user-key', customerToken)
+        .end((error, res) => {
+          console.log('error -->***', error);
+          console.log('error response ->>))', res.body);
+          expect(res.status).to.equal(500);
+          stub.restore();
+          done(error);
         });
     });
   });
