@@ -4,6 +4,12 @@ const user = {
   password: 'gillberto5',
 };
 
+const user_2 = {
+  name: 'gilbert erick',
+  email: 'gillberto@gmail.com',
+  password: 'gillberto5',
+};
+
 const updatedUser = {
   name: 'effa evaristus',
   email: 'effa.evaristus@gmail.com'
@@ -33,8 +39,9 @@ const invalidCard = {
 };
 
 export {
-  user,
   updatedUser,
+  user,
+  user_2,
   address,
   phone,
   card,
