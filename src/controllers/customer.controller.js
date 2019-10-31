@@ -5,11 +5,11 @@ import response from '../helpers/response';
 
 /**
  * @class CustomerController
+ * @description handles all requests that has to do with customer
  */
 class CustomerController {
   /**
-   * create a customer record
-   *
+   * @description create a customer record
    * @static
    * @param {object} req express request object
    * @param {object} res express response object
@@ -35,8 +35,7 @@ class CustomerController {
   }
 
   /**
-   * log in a customer
-   *
+   * @description log in a customer
    * @static
    * @param {object} req express request object
    * @param {object} res express response object
@@ -68,8 +67,7 @@ class CustomerController {
   }
 
   /**
-   * get customer profile data
-   *
+   * @description get customer profile data
    * @static
    * @param {object} req express request object
    * @param {object} res express response object
@@ -94,9 +92,8 @@ class CustomerController {
   }
 
   /**
-   * update customer profile data
+   * @description update customer profile data
    * such as name, email, password, day_phone, eve_phone and mob_phone
-   *
    * @static
    * @param {object} req express request object
    * @param {object} res express response object
