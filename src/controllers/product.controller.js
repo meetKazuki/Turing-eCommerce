@@ -3,17 +3,18 @@ import response from '../helpers/response';
 
 /**
  * @class CustomerController
+ * @description contains all static methods that handles product request
  */
 class ProductController {
 /**
-   * get all departments
+   * @description get all departments
    * @static
-   * @param {object} req express request object
+   * @param {null} _
    * @param {object} res express response object
    * @returns {json} json object with status and department list
    * @memberof ProductController
    */
-  static async getAllDepartments(req, res) {
+  static async getAllDepartments(_, res) {
     try {
       const departments = await Department.findAll();
       response.setSuccess(200, 'retrieval successful', departments);

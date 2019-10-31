@@ -6,7 +6,12 @@ import app from '../../..';
 import capitalize from '../../../helpers/capitalize';
 import { Customer } from '../../../database/models';
 import {
-  user, user_2, phone, card, invalidCard, address
+  user,
+  user_2,
+  phone,
+  card,
+  invalidCard,
+  address
 } from '../mocks/users.mock';
 
 let customerToken;

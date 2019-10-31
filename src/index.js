@@ -26,6 +26,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(router);
 
 const port = process.env.NODE_ENV === 'test' ? 8378 : process.env.PORT || 3000;
+
 if (process.env.NODE_ENV !== 'test') {
   app.listen(
     port, () => log(`Server is running on http://localhost:${port}`)
